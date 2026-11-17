@@ -32,7 +32,7 @@ rise 5x-10x from hour 1, huge launches only ~1.3x-1.7x.
    hour-1, so the fit never extrapolates to an evening below hour 1 for a
    launch bigger than anything in the training set.
 4. Spread per hour is 0.9 x the regression's residual standard deviation,
-   smoothed across neighbouring hours, floored at 0.10 log units.
+   smoothed across neighbouring hours (13-point mean, +/-6 h), floored at 0.10 log units.
 
 Quantiles are `p1 * exp(mu_h + z_tau * s_h)`, rounded half-up to 2 decimals.
 No network, no randomness, no future information: the program reads only the
@@ -47,14 +47,16 @@ hours (recovered from SullyGnome, the same public source the house used;
 
 | case | hour-1 print | this entry | house baseline |
 | --- | --- | --- | --- |
-| Marvel's Wolverine | 23,357 | 0.241 | 0.744 |
-| Red Dead Redemption 2 | 116,550 | 0.151 | 0.287 |
+| Marvel's Wolverine | 23,357 | 0.234 | 0.744 |
+| Red Dead Redemption 2 | 116,550 | 0.152 | 0.287 |
 | God of War Ragnarök | 269,517 | 0.139 | 0.215 |
-| Marvel's Spider-Man 2 | 119,087 | 0.189 | 0.303 |
-| **mean pinball loss (log scale)** | | **0.180** | **0.387** |
+| Marvel's Spider-Man 2 | 119,087 | 0.186 | 0.303 |
+| **mean pinball loss (log scale)** | | **0.178** | **0.387** |
 
 The model was chosen by 20-fold leave-one-out cross-validation over 20
 rolling-like launches (not by tuning to the four practice cases): baseline
-0.425, median-ratio 0.299, this OLS model 0.266. Details in `STUDY.md`.
+0.425, median-ratio 0.299, this OLS model 0.264. The spread smoothing width
+(13-point mean, +/-6 h) was also chosen by LOO: 0.266 at width 3, 0.264 at
+width 13 (broad plateau 11-15). Details in `STUDY.md`.
 
 Built for the make.fun gta6-twitch-ccu-forecast-01 competition. MIT licensed.

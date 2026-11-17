@@ -20,8 +20,8 @@ hard-coded from any practice launch):
     training hour-1: past that scale the linear slope would extrapolate to
     an evening below hour 1, which contradicts the rolling pattern.
   - Spread per hour is 0.9 x the regression's residual standard deviation,
-    smoothed across neighbouring hours (3-point mean), floored at 0.10 log
-    units. Quantiles are p1 * exp(mu_h + z_tau * s_h), z the standard
+    smoothed across neighbouring hours (13-point mean, +/-6 h), floored at
+    0.10 log units. Quantiles are p1 * exp(mu_h + z_tau * s_h), z the standard
     normal's quantiles, rounded half-up to 2 decimals.
 
 Reads only the case file it is given (hour 1 + pre-deadline history +
@@ -149,12 +149,19 @@ def fit_model(case):
             lr = sorted(ys)
             med = lr[len(lr) // 2] if lr else 0.0
             params[h] = (med, 0.0, 0.5)
-    # Smooth the spread across neighbouring hours (3-point mean).
+    # Smooth the spread across neighbouring hours (13-point mean, +/-6 h).
+    # Per-hour residual SDs come from ~19 launches, so each is noisy (~18%
+    # sampling error); the true spread is a smooth hump over the day (low
+    # overnight, high midday, lower in the evening), so borrowing strength
+    # across hours cuts estimation noise. Width chosen by 20-fold
+    # leave-one-out CV: LOO pinball 0.2657 at width 3 -> 0.2638 at width 13
+    # (broad plateau 11-15; pooled single SD is worse again at 0.2656), and
+    # the practice-4 mean improves 0.1799 -> 0.1778 at the same time.
     sds = [params[h][2] for h in range(2, 25)]
     smooth = []
     for i in range(len(sds)):
-        lo = max(0, i - 1)
-        hi = min(len(sds), i + 2)
+        lo = max(0, i - 6)
+        hi = min(len(sds), i + 7)
         smooth.append(sum(sds[lo:hi]) / (hi - lo))
 
     def predict(h, log_p1_eff):

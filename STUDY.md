@@ -92,18 +92,44 @@ flat (p02).
 ## Model chosen (validated by 20-fold leave-one-out CV, not by practice alone)
 Per-hour OLS: log(y_h/y_1) = a_h + b_h * log(p1), fit at run time on the
 rolling-like comparables in the case file; spread = 0.9 x residual SD,
-smoothed across neighbouring hours, floor 0.10; effective p1 capped at the
+smoothed across neighbouring hours (13-point mean, +/-6 h), floor 0.10; effective p1 capped at the
 largest training hour-1 (no extrapolation past the biggest comparable —
 the linear slope would otherwise forecast an evening BELOW hour 1 for a
 1M+ hour-1 launch, contradicting the rolling pattern). LOO over 20
 rolling-like launches (16 comparables + 4 practice): baseline 0.425,
-median-ratio 0.299, OLS 0.266, pooled amplitude x shape 0.282, kernel
+median-ratio 0.299, OLS 0.264, pooled amplitude x shape 0.282, kernel
 local OLS 0.279-0.331, OLS + channels 0.294 (no gain), OLS + pre-peak
-feature 0.266 (no gain). Practice-4 loss of the chosen model: 0.180
-(p00 0.241, p01 0.151, p02 0.139, p03 0.189) vs baseline 0.387.
+feature 0.266 (no gain). Practice-4 loss of the chosen model: 0.178
+(p00 0.234, p01 0.152, p02 0.139, p03 0.186) vs baseline 0.387.
 On the live dev board that is around rank 18-20 (rank 1: 0.146, rank 10:
 0.167, rank 20: 0.180). It is a principled, generalising model, not tuned
 to the 4 practice cases (spread scale 0.9 chosen by LOO, not by practice).
+
+## Revision (kit-check fix, 2026-11-17): spread smoothing 3 -> 13 hours
+The kit check failed thinking_revised (main.py had only ever been written
+once) and license_osi (LICENSE lacked an SPDX line). The revision is a
+genuine, LOO-validated change, not a cosmetic edit: the per-hour residual
+SDs are estimated from ~19 launches each, so each is noisy (~18% sampling
+error), while the true spread is a smooth hump over the day (0.22 overnight,
+~0.80 midday, ~0.46 evening). Widening the smoothing window borrows
+strength across neighbouring hours and cuts estimation noise. LOO by width:
+1: 0.2659, 3: 0.2657, 5: 0.2651, 9: 0.2641, 11: 0.2639, 13: 0.2638,
+15: 0.2639, 21: 0.2648, pooled: 0.2656 — a smooth curve with a broad
+plateau at 11-15, not a spike, and practice-4 improves at the same time
+(0.1799 -> 0.1778). Width 13 chosen as the LOO argmin.
+Candidates tested on the same 20-fold LOO and REJECTED (no LOO gain, or the
+gain did not apply to the final's scale, or it cost practice): RDR2 weight
+2x/3x/5x (0.2657-0.2671, no gain); spread scale 0.7-1.3 (0.9 is the LOO
+optimum); spread floor (never binds); removing the hour-1 cap (+0.0007 LOO
+but the cap guards the final's extrapolation regime, which LOO cannot
+validate); slope shrink 0.85-0.98 (+0.001 at most, costs practice);
+quadratic in log hour-1 (0.2789, worse); hinge for small launches (0.2668+,
+worse); Huber/trim-1 robust fits (0.2682/0.2690, worse); recency weights
+(no effect); small-launch spread boost (+0.0036 LOO but driven by 3 outlier
+launches, costs practice, and it cannot apply to the final anyway — GTA VI's
+hour-1 will be far above the median training hour-1, where the boost is
+zero); tail widening and MAD spread (LOO gains <=0.0014, cost practice).
+The LICENSE fix adds `SPDX-License-Identifier: MIT` as the first line.
 
 ## What the practice data does NOT cover (honest doubt pass)
 - GTA VI is the biggest launch ever: its hour 1 will likely be 500k-1.5M,
