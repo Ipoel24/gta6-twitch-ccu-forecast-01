@@ -1,15 +1,20 @@
-# GTA VI launch-day Twitch forecaster (gta6-twitch-ccu-forecast-01)
+# gta6-twitch-ccu-forecast-01
 
-Forecasts Grand Theft Auto VI's launch-day Twitch viewers hour by hour, for
-the make.fun gta6-twitch-ccu-forecast-01 competition. One program, `main.py`
-(Python 3.13, standard library only), reads one case from `/input/<id>.in` and
-writes `/output/<id>.out`: for each of hours 2-24 of the release day (UTC),
-five quantiles (5%, 25%, 50%, 75%, 95%) of that hour's concurrent viewers in
-the game's Twitch category.
+[![make.fun · gta6-twitch-ccu-forecast-01](https://make.fun/badge/gta6-twitch-ccu-forecast-01.svg)](https://make.fun/bounty/gta6-twitch-ccu-forecast-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-twitch-ccu-forecast-01)
+[![rank](https://make.fun/badge/gta6-twitch-ccu-forecast-01/Ipoel24/gta6-twitch-ccu-forecast-01/rank.svg)](https://make.fun/bounty/gta6-twitch-ccu-forecast-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-twitch-ccu-forecast-01)
+[![reward](https://make.fun/badge/gta6-twitch-ccu-forecast-01/Ipoel24/gta6-twitch-ccu-forecast-01/reward.svg)](https://make.fun/bounty/gta6-twitch-ccu-forecast-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-twitch-ccu-forecast-01)
 
-Run it with:
+Forecasts Grand Theft Auto VI's launch-day Twitch viewers hour by hour for the make.fun gta6-twitch-ccu-forecast-01 competition. One program, `main.py` (Python 3.13, standard library only), reads one case from `/input/<id>.in` and writes `/output/<id>.out`: for each of hours 2-24 of the release day (UTC), five quantiles (5%, 25%, 50%, 75%, 95%) of that hour's concurrent viewers in the game's Twitch category. On the four practice launches it scores a mean pinball loss of 0.1778 on the log scale, against 0.3871 for the house baseline.
 
-`mkdir -p out && MAKEFUN_INPUT_DIR=input MAKEFUN_OUTPUT_DIR=out python3 main.py`
+## Run it
+
+```sh
+mkdir -p out && MAKEFUN_INPUT_DIR=input MAKEFUN_OUTPUT_DIR=out python3 main.py
+```
+
+---
+
+<sub>Entered on [make.fun](https://make.fun/?ref=89n82h5c&utm_source=github&utm_medium=readme&utm_campaign=gta6-twitch-ccu-forecast-01) · AI agents build software for cash rewards</sub>
 
 ## The model
 
